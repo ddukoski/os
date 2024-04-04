@@ -1,3 +1,5 @@
+package sync;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -10,7 +12,6 @@ public class SyncBuffer {
 
     public static int numControllers;
     public static Semaphore numAccessing;
-    public static Lock restrictSameItemCheck;
     public static Semaphore executionMutex;
     public static Semaphore cSem;
 
@@ -28,15 +29,13 @@ public class SyncBuffer {
         al.add(20);
         al.add(30);
         al.add(40);
+
         Buffer b = new Buffer(new ArrayList<>(al));
 
         List<Thread> threadList = new ArrayList<>();
 
-
-        IntStream.range(0, 30).forEach(i -> threadList.add(new Producer(b)));
-
-        IntStream.range(0, 30).forEach(i -> threadList.add(new Controller(b)));
-
+        IntStream.range(0, 20).forEach(i -> threadList.add(new Producer(b)));
+        IntStream.range(0, 35).forEach(i -> threadList.add(new Controller(b)));
 
         threadList.forEach(Thread::start);
 
@@ -44,7 +43,7 @@ public class SyncBuffer {
             thread.join();
         }
 
-        System.out.println(b.removed); // number might not always be the same since
+        System.out.println(b.removed);
         System.out.println(b.removed.size());
     }
 }
@@ -75,10 +74,10 @@ class Producer extends Thread {
 
 class Controller extends Thread {
 
-    private Buffer buffer;
+    private final Buffer buffer;
 
     // unnecessary if the buffer check/removal is always on a different number ( it's not in our case )
-    private static Lock restrictSameItemCheck = new ReentrantLock();
+    private static final Lock restrictSameItemCheck = new ReentrantLock();
 
     public Controller(Buffer b) {
         this.buffer = b;
@@ -92,20 +91,22 @@ class Controller extends Thread {
         SyncBuffer.numControllers++;
         SyncBuffer.numAccessing.release();
 
-        try {
-            SyncBuffer.cSem.acquire();
-        } catch (InterruptedException exc) {
-            exc.printStackTrace();
-        }
+
+        // Item check & removal (in buffer)
+        SyncBuffer.cSem.acquire();
 
         restrictSameItemCheck.lock();
         buffer.check();
         restrictSameItemCheck.unlock();
+        SyncBuffer.cSem.release();
 
         SyncBuffer.numAccessing.acquire();
-        SyncBuffer.numControllers--;
-        SyncBuffer.cSem.release();
+
+        // this controller (thread) is finished with checking, it will never access buffer again
+        SyncBuffer.numControllers--; // this can be between line 100 and 99 with no problem (but lock first)
         if (SyncBuffer.numControllers == 0) {
+
+            // last controller stopping, allow producer to enter if it must
             SyncBuffer.executionMutex.release();
         }
         SyncBuffer.numAccessing.release();
@@ -132,7 +133,7 @@ class Buffer {
 
     public void produce() {
         Random r = new Random();
-        buffer.add(r.nextInt(1000));
+        buffer.add(r.nextInt(100));
     }
 
     public void check() {
