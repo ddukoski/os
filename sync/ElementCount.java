@@ -23,7 +23,6 @@ public class ElementCount {
 
     // TODO: Define sychronization elements and initialize
 
-    // DO NOT CHANGE
     public static int[] getSubArray(int[] array, int start, int end) {
         return Arrays.copyOfRange(array, start, end);
     }
@@ -32,7 +31,6 @@ public class ElementCount {
 
         int[] arr = ArrayGenerator.generate(ARRAY_LENGTH, SEARCH_TARGET);
 
-        // TODO: Make the SearchThread class a thread and start 10 instances
         // Each instance should take a subarray from the original array with equal length
 
         List<CountThread> countThreads = new ArrayList<>();
@@ -50,17 +48,11 @@ public class ElementCount {
         for (CountThread countThread : countThreads) {
             countThread.join();
         }
-        // DO NOT CHANGE
 
         System.out.println("The number of total counted elements is: " + count);
         System.out.println("The generated number of elements is: " + ArrayGenerator.elementCount);
-
-        // TODO: The max thread should print the number of occurences
-
     }
 
-    // TO DO: Make the SearchThread class a thread
-// You can add methods or attributes if necessary
     static class CountThread extends Thread {
 
         private final static Lock arrayMutex = new ReentrantLock();
@@ -105,7 +97,7 @@ public class ElementCount {
             arrayMutex.unlock();
 
 
-            revealMax.acquire(); //stuck here
+            revealMax.acquire();
             arrayMutex.lock();
             if (localCount == max)
                 System.out.printf("\nThread %d says: %d, so I'm the highest!%n",
@@ -123,7 +115,6 @@ public class ElementCount {
     }
 
 
-    //************ DO NOT CHANGE ************//
     static class BoundedRandomGenerator {
         static final Random random = new Random();
         static final int RANDOM_BOUND = 100;
@@ -154,7 +145,5 @@ public class ElementCount {
             return array;
         }
     }
-
-
 }
 
