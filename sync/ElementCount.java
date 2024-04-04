@@ -69,14 +69,14 @@ public class ElementCount {
         }
 
         public void countElements() {
-            arrayMutex.lock();
             for (int num : this.arr) {
                 if (num == target) {
+                    arrayMutex.lock();
                     count++;
+                    arrayMutex.unlock();
                     localCount++;
                 }
             }
-            arrayMutex.unlock();
 
             System.out.println("Local count of " + Thread.currentThread().threadId() + " is: " + localCount);
         }
