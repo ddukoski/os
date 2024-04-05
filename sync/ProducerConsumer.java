@@ -1,6 +1,7 @@
 package sync;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -42,8 +43,8 @@ public class ProducerConsumer {
 
     static class Consumer extends Thread {
 
-        private Buffer buffer;
-        private int consumerId;
+        private final Buffer buffer;
+        private final int consumerId;
 
         public Consumer(int consumerId, Buffer buffer) {
             this.buffer = buffer;
@@ -51,13 +52,18 @@ public class ProducerConsumer {
         }
 
         public void execute() throws InterruptedException {
+
+            //stop ANY thread (reason for array usage) for continuing if the buffer is not full
             productPermissions[consumerId].acquire();
             buffer.getItem(consumerId);
 
-            execMutex.acquire(); // ONLY 1 THREAD IS EXECUTING THIS
+            // One and ONLY 1 item must execute due to the race condition of the number of items in the buffer
+            execMutex.acquire();
             buffer.decrementNumberOfItemsLeft();
-            if (buffer.isBufferEmpty()) { // the last thread is executing
-                emptyBuffer.release(); // buffer needs to be filled, so pass control to producer
+            // Check if the buffer is empty, if it is, then this is the last Consumer emptying
+            if (buffer.isBufferEmpty()) {
+            // Pass over control to producer, this is the last one and no other Consumer is waiting to take the mutex
+                emptyBuffer.release();
             }
             execMutex.release();
         }
@@ -75,22 +81,22 @@ public class ProducerConsumer {
     }
 
     static class Producer extends Thread {
-        private Buffer buffer;
+        private final Buffer buffer;
 
         public Producer(Buffer buffer) {
             this.buffer = buffer;
         }
 
         public void execute() throws InterruptedException {
-            emptyBuffer.acquire();
+            emptyBuffer.acquire(); // Take control of the buffer and fill it up
 
             execMutex.acquire();
-            buffer.fillBuffer();
+            buffer.reload(); // Fill the buffer
+
+            // Can be after critical section too, but this will put Consumers ahead for a bit and then wait for a mutex
+            Arrays.stream(productPermissions).forEach(Semaphore::release);
             execMutex.release();
 
-            for (int i = 0; i < NUM_CONSUMERS; i++) {
-                productPermissions[i].release(1);
-            }
         }
 
         @Override
@@ -117,11 +123,7 @@ public class ProducerConsumer {
             this.numConsumers = numConsumers;
         }
 
-        public int getBufferCapacity() {
-            return numConsumers;
-        }
-
-        public void fillBuffer() {
+        public void reload() {
             if (numItems != 0) {
                 throw new RuntimeException("The buffer is not empty!");
             }
@@ -141,7 +143,7 @@ public class ProducerConsumer {
         }
 
         public void getItem(int consumerId) {
-            System.out.println(String.format("Get item for consumer with id: %d.", consumerId));
+            System.out.printf("Get item for consumer with id: %d.%n", consumerId);
         }
     }
 
