@@ -27,16 +27,16 @@ public class ProducerConsumer {
     public static void main(String[] args) {
         init();
 
-        Buffer sharedBuffer = new Buffer(NUM_CONSUMERS);
+        Buffer sharedBuffer = new Buffer( NUM_CONSUMERS );
         Producer p = new Producer(sharedBuffer);
         p.start();
 
         List<Consumer> consumers = new ArrayList<>();
-        for (int i = 0; i < NUM_CONSUMERS; i++) {
+        for ( int i = 0; i < NUM_CONSUMERS; i++ ) {
             consumers.add(new Consumer(i, sharedBuffer));
         }
 
-        for (int i = 0; i < NUM_CONSUMERS; i++) {
+        for ( int i = 0; i < NUM_CONSUMERS; i++ ) {
             consumers.get(i).start();
         }
     }
@@ -62,7 +62,7 @@ public class ProducerConsumer {
             buffer.decrementNumberOfItemsLeft();
             // Check if the buffer is empty, if it is, then this is the last Consumer emptying
             if (buffer.isBufferEmpty()) {
-            // Pass over control to producer, this is the last one and no other Consumer is waiting to take the mutex
+                // Pass over control to producer, this is the last one and no other Consumer is waiting to take the mutex
                 emptyBuffer.release();
             }
             execMutex.release();
@@ -73,8 +73,8 @@ public class ProducerConsumer {
             for (int i = 0; i < ProducerConsumer.NUM_RUNS; i++) {
                 try {
                     execute();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                } catch ( InterruptedException e ) {
+                    throw new RuntimeException( e );
                 }
             }
         }
@@ -94,7 +94,7 @@ public class ProducerConsumer {
             buffer.reload(); // Fill the buffer
 
             // Can be after critical section too, but this will put Consumers ahead for a bit and then wait for a mutex
-            Arrays.stream(productPermissions).forEach(Semaphore::release);
+            Arrays.stream( productPermissions ).forEach(Semaphore::release);
             execMutex.release();
 
         }
