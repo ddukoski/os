@@ -1,6 +1,7 @@
 package networking;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +20,13 @@ public class WebRequest {
         this.header = header;
     }
 
-    public static WebRequest of(BufferedReader br){
+    public static WebRequest of(BufferedReader br) throws IOException {
         List<String> strings = new ArrayList<>();
-        br.lines().forEach(strings::add);
-        System.out.println(strings.get(0));
+        String line;
+
+        while(!(line = br.readLine()).isEmpty()) {
+            strings.add(line);
+        }
 
         String[] getLine = strings.get(0).split("\\s++");
         Map<String, String> headers = new HashMap<>();
