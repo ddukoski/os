@@ -1,4 +1,4 @@
-package networking;
+package networking.tcp;
 
 import java.io.*;
 import java.net.Socket;
