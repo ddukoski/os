@@ -11,7 +11,7 @@ public class WebRequest {
     public String command; //GET, POST, PUT, ...
     public String url;
     public String version; //HTTP version
-    private Map<String, String> header;
+    public Map<String, String> header;
 
     private WebRequest(String command, String url, String version, Map<String, String> header) {
         this.command = command;
@@ -24,18 +24,18 @@ public class WebRequest {
         List<String> strings = new ArrayList<>();
         String line;
 
-        while(!(line = br.readLine()).isEmpty()) {
+        while (!(line = br.readLine()).isEmpty()) {
             strings.add(line);
         }
 
-        String[] getLine = strings.get(0).split("\\s++");
+        String[] firstLine = strings.get(0).split("\\s++");
         Map<String, String> headers = new HashMap<>();
 
-        for(int i = 1 ; i < strings.size() - 1; ++i) {
+        for(int i = 1 ; i < strings.size(); ++i) {
             String[] parts = strings.get(i).split(":\\s++");
-            headers.put( parts[0],parts[1] );
+            headers.put( parts[0], parts[1] );
         }
 
-        return new WebRequest(getLine[0], getLine[1], getLine[2], headers);
+        return new WebRequest(firstLine[0], firstLine[1], firstLine[2], headers);
     }
 }
