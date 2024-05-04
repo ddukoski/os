@@ -1,4 +1,4 @@
-package networking;
+package networking.tcp;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -42,7 +42,9 @@ public class Server extends Thread {
 
     public static void main(String[] args) {
         Server server = new Server(7000);
+        Client client = new Client(7000);
         server.start();
+        client.start();
     }
 
 }
