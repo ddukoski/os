@@ -13,12 +13,13 @@ public class Client extends Thread {
 
     @Override
     public void run() {
-        Socket socket;
+        Socket socket = null;
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
         try {
             socket = new Socket(InetAddress.getLocalHost(), serverPort);
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             writer.write("GET / HTTP/1.1\n");
             writer.write("Host: developer.mozilla.org\n");
@@ -33,13 +34,17 @@ public class Client extends Thread {
                 System.out.printf("Client received: %s\n", line);
             }
 
-            writer.close();
-            reader.close();
-            socket.close();
-
         } catch (IOException e) {
             System.err.println(e.getMessage());
             throw new RuntimeException(e);
+        } finally {
+            try {
+                writer.close();
+                reader.close();
+                socket.close();
+            } catch (IOException exc) {
+                System.err.println(exc.getMessage());
+            }
         }
     }
 

@@ -23,12 +23,15 @@ public class Worker extends Thread{
              BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socketOutput));
              WebRequest req = WebRequest.of(reader);
 
-             System.out.println(req.command + " " + req.url);
+             System.out.printf("%s %s %s\n",req.command, req.url, req.version);
 
              writer.write("HTTP/1.1 200 OK\n");
-             writer.write("Content-Type: text/html\n\n"); //The other headers are meta-data of the browser and are not written
+
+             //The other headers are meta-data of the browser and are not written -> \n\n specifies end of HTML response
+             writer.write("Content-Type: text/html\n\n");
              writer.write(String.format("Hello there, %s\n", req.header.get("User-Agent")));
 
+             //flush() will IMMEDIATELY write anything left in the stream and clear it of any elements inside it
              writer.flush();
 
              reader.close();
