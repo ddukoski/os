@@ -16,10 +16,12 @@ public class Server extends Thread {
     public void run() {
         System.out.printf("Server starting on port %d...\n", this.port);
 
-        ServerSocket serverSocket;
+        ServerSocket serverSocket = null;
         try {
-            // the server does not need to connect with the user, so the user sends requests and the server
-            // ACCEPTS connections from outer sockets, so we do not specify an IP address here.
+            // the server does not need to connect with the user, so the user sends requests
+            // and the server
+            // ACCEPTS connections from outer sockets, so we do not specify an IP address
+            // here.
             serverSocket = new ServerSocket(port);
 
             System.out.printf("Server started on port %d.\n", this.port);
@@ -28,7 +30,7 @@ public class Server extends Thread {
 
                 Socket socket;
                 try {
-                    socket = serverSocket.accept(); //accept the connection request from the client port
+                    socket = serverSocket.accept(); // accept the connection request from the client port
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -40,6 +42,13 @@ public class Server extends Thread {
         } catch (IOException e) {
             System.err.println(e.getMessage());
             throw new RuntimeException(e);
+        } finally {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
+                throw new RuntimeException(e);
+            }
         }
 
     }
