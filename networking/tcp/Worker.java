@@ -25,6 +25,8 @@ public class Worker extends Thread{
 
              System.out.printf("%s %s %s\n",req.command, req.url, req.version);
 
+
+             //The first part is the HTTP response, then the content (marked below)
              writer.write("HTTP/1.1 200 OK\n");
 
              //The other headers are meta-data of the browser and are not written -> \n\n specifies end of HTML response
