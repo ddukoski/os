@@ -35,6 +35,7 @@ public class Server extends Thread{
                 // since we are reading from a byte array of 1024 bytes available (1024 chars), we need to limit
                 // the output buffer to a number of bytes exactly equal to the length of the message,
                 // to avoid bad output, by using the String constructor below
+
                 String message = new String(receivedPacket.getData(), 0, receivedPacket.getLength());
 
                 if (message.equals("quit")) {
