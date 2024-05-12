@@ -7,6 +7,6 @@ services:
   frontend:
     image: nginx
     volumes:
-      - "./frontend:/usr/share/nginx/html"
+      - frontend:/usr/share/nginx/html
     ports:
       - 80:80
