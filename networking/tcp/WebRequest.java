@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 public class WebRequest {
-    public String command; //GET, POST, PUT, ...
-    public String url;
-    public String version; //HTTP version
-    public Map<String, String> header;
+    public String command; // GET, POST, PUT, ...
+    public String url; // http://www. -||- .tld
+    public String version; // HTTP version
+    public Map<String, String> header; // headers following after the [GET,POST,PUT...} / HTTP/1.1
 
     private WebRequest(String command, String url, String version, Map<String, String> header) {
         this.command = command;

@@ -5,7 +5,7 @@ import java.net.Socket;
 
 public class Worker extends Thread {
 
-    private Socket socket;
+    private final Socket socket;
 
     public Worker(Socket socket) {
         this.socket = socket;
@@ -26,14 +26,14 @@ public class Worker extends Thread {
             System.out.printf("%s %s %s\n", req.command, req.url, req.version);
 
 
-            //The first part is the HTTP response, then the content (marked below)
+            // The first part is the HTTP response, then the content (marked below)
             writer.write("HTTP/1.1 200 OK\n");
 
-            //The other headers are meta-data of the browser and are not written -> \n\n specifies end of HTML response
+            // The other headers are meta-data of the browser and are not written -> \n\n specifies end of HTML response
             writer.write("Content-Type: text/html\n\n");
             writer.write(String.format("Hello there, %s\n", req.header.get("User-Agent")));
 
-            //flush() will IMMEDIATELY write anything left in the stream and clear it of any elements inside it
+            // flush() will IMMEDIATELY write anything left in the stream and clear it of any elements inside it
             writer.flush();
 
             reader.close();
