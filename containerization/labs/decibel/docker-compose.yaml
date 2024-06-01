@@ -1,0 +1,31 @@
+    services:
+      sensor:
+        build: ./sensor
+        volumes:
+          - soundlevel:/home/usr/app/shared
+        environment:
+          LOW_SOUNDLEVEL: ${LOW}
+          MEDIUM_SOUNDLEVEL: ${MEDIUM}
+          HIGH_SOUNDLEVEL: ${HIGH}
+        networks:
+          - city-noisepollution-network
+
+      monitor:
+        build: ./monitor
+        volumes:
+          - noisepollution:/home/usr/app/shared
+          - soundlevel:/home/usr/app/shared
+        environment:
+          LOW_SOUNDLEVEL: ${LOW}
+          MEDIUM_SOUNDLEVEL: ${MEDIUM}
+          HIGH_SOUNDLEVEL: ${HIGH}
+        networks:
+          - city-noisepollution-network
+
+    volumes:
+      soundlevel:
+      noisepollution:
+
+    networks:
+      city-noisepollution-network:
+        driver: bridge

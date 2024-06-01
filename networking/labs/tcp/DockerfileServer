@@ -1,0 +1,5 @@
+FROM eclipse-temurin
+WORKDIR /home/usr/app
+COPY . .
+RUN javac TCPServer.java Worker.java
+CMD ["java", "TCPServer.java"]

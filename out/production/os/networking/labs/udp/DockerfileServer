@@ -1,0 +1,5 @@
+FROM eclipse-temurin
+WORKDIR /home/usr/app
+COPY UDPServer.java .
+RUN javac UDPServer.java
+CMD ["java", "TCPServer.java"]

@@ -1,0 +1,27 @@
+services:
+  sensor:
+    build: ./sensor
+    volumes:
+      - temperature:/home/usr/app/shared
+    networks:
+      - temperature-level-network
+
+  monitor:
+    build: ./monitor
+    volumes:
+      - temperaturelevel:/home/usr/app/shared
+      - temperature:/home/usr/app/shared
+    networks:
+      - temperature-level-network
+    environment:
+      LOW: ${LOW}
+      MEDIUM: ${MEDIUM}
+      HIGH: ${HIGH}
+
+volumes:
+  temperaturelevel:
+  temperature:
+
+networks:
+  temperature-level-network:
+    driver: bridge

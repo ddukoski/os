@@ -1,0 +1,54 @@
+services:
+  tcp-server:
+    build:
+      context: tcp
+      dockerfile: DockerfileServer
+    networks:
+      - tcp-communication
+    ports:
+      - 7000:7000
+    expose:
+      - 7000
+      
+  tcp-client:
+    build:
+      context: tcp
+      dockerfile: DockerfileClient
+    networks:
+      - tcp-communication
+    deploy:
+      replicas: 5
+    environment:
+      HOSTNAME: tcp-server
+    depends_on:
+      - tcp-server
+
+  udp-server:
+    build:
+      context: udp
+      dockerfile: DockerfileServer
+    networks:
+      - udp-communication
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+
+  udp-client:
+    build:
+      context: udp
+      dockerfile: DockerfileClient
+    networks:
+      - udp-communication
+    deploy:
+      replicas: 5
+    environment:
+      HOSTNAME: udp-server
+    depends_on:
+      - udp-server
+
+networks:
+  tcp-communication:
+    driver: bridge
+  udp-communication:
+    driver: bridge
